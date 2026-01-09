@@ -3,11 +3,16 @@ const router = express.Router();
 const {
   createBus,
   assignRouteToBus,
+  approveBus,
+  delistBus,
+  assignOperatorToBus,
 } = require("../controllers/bus.controller");
+
 const { protect } = require("../middleware/auth.middleware");
 const { authorizeRoles } = require("../middleware/role.middleware");
 
 router.post("/", protect, authorizeRoles("SUPER_ADMIN"), createBus);
+
 router.post(
   "/assign-route",
   protect,
@@ -15,4 +20,15 @@ router.post(
   assignRouteToBus
 );
 
+// ✅ ADD THESE
+router.post("/approve", protect, authorizeRoles("SUPER_ADMIN"), approveBus);
+
+router.post("/delist", protect, authorizeRoles("SUPER_ADMIN"), delistBus);
+
+router.post(
+  "/assign-operator",
+  protect,
+  authorizeRoles("SUPER_ADMIN"),
+  assignOperatorToBus
+);
 module.exports = router;

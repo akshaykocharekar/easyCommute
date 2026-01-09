@@ -5,17 +5,31 @@ const busSchema = new mongoose.Schema(
     busNumber: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     capacity: {
       type: Number,
-      required: true,
+      required: true
     },
     route: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Route",
-      default: null,
+      default: null
     },
+    operator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null
+    },
+    isApproved: {
+      type: Boolean,
+      default: false
+    },
+    status: {
+      type: String,
+      enum: ["ACTIVE", "INACTIVE"],
+      default: "INACTIVE"
+    }
   },
   { timestamps: true }
 );
