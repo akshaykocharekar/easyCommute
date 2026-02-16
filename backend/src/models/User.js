@@ -6,24 +6,42 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
     },
+
     password: {
       type: String,
       required: true,
     },
+
     role: {
       type: String,
       enum: ["SUPER_ADMIN", "BUS_OPERATOR", "USER"],
       default: "USER",
     },
+
+    subscriptionPlan: {
+      type: String,
+      enum: ["FREE", "PREMIUM"],
+      default: "FREE",
+    },
+
     subscriptionStatus: {
       type: String,
-      enum: ["ACTIVE", "EXPIRED"],
-      default: "EXPIRED",
+      enum: ["ACTIVE", "INACTIVE"],
+      default: "INACTIVE",
+    },
+
+    razorpayPaymentId: {
+      type: String,
+    },
+
+    subscriptionActivatedAt: {
+      type: Date,
     },
   },
   { timestamps: true }

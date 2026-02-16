@@ -27,3 +27,24 @@ exports.getAllRoutes = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.addStopToRoute = async (req, res) => {
+  try {
+    const { routeId, name, latitude, longitude } = req.body;
+
+    const route = await Route.findById(routeId);
+    if (!route) {
+      return res.status(404).json({ message: "Route not found" });
+    }
+
+    route.stops.push({ name, latitude, longitude });
+    await route.save();
+
+    res.json({
+      message: "Stop added successfully",
+      route,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

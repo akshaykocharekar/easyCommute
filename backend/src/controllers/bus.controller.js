@@ -101,3 +101,36 @@ exports.assignOperatorToBus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.updateOccupancy = async (req, res) => {
+  try {
+    const { occupancy } = req.body;
+    const operatorId = req.user._id;
+
+    const bus = await Bus.findOne({
+      operator: operatorId,
+      isApproved: true,
+      status: "ACTIVE",
+    });
+
+    if (!bus) {
+      return res.status(403).json({ message: "No approved bus assigned" });
+    }
+
+    if (occupancy < 0 || occupancy > bus.capacity) {
+      return res.status(400).json({
+        message: "Invalid occupancy value",
+      });
+    }
+
+    bus.currentOccupancy = occupancy;
+    await bus.save();
+
+    res.json({
+      message: "Occupancy updated successfully",
+      bus,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

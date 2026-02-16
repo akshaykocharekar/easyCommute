@@ -6,6 +6,7 @@ const {
   approveBus,
   delistBus,
   assignOperatorToBus,
+  updateOccupancy,
 } = require("../controllers/bus.controller");
 
 const { protect } = require("../middleware/auth.middleware");
@@ -31,4 +32,12 @@ router.post(
   authorizeRoles("SUPER_ADMIN"),
   assignOperatorToBus
 );
+
+router.post(
+  "/update-occupancy",
+  protect,
+  authorizeRoles("BUS_OPERATOR"),
+  updateOccupancy
+);
+
 module.exports = router;
