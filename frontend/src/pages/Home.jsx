@@ -1,6 +1,23 @@
 import { Link } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+/* Fix default marker icon issue in React Leaflet */
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
+  iconUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+});
 
 function Home() {
+  const collegeCoords = [15.2750, 73.9570]; // VVM’s S.G.R.E.E. Damodar College, Margao
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-white px-6">
 
@@ -16,7 +33,6 @@ function Home() {
 
         {/* LEFT TEXT */}
         <div>
-
           <p className="mb-4 text-sm font-semibold text-emerald-600">
             Smart Public Transport
           </p>
@@ -33,7 +49,6 @@ function Home() {
           </p>
 
           <div className="mt-10 flex gap-4">
-
             <Link to="/register">
               <button className="rounded-full bg-black px-8 py-3 text-sm font-medium text-white transition hover:scale-105 hover:opacity-90">
                 Get Started
@@ -45,32 +60,48 @@ function Home() {
                 Login
               </button>
             </Link>
-
           </div>
-
         </div>
 
         {/* RIGHT PRODUCT PREVIEW */}
         <div className="relative">
-
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
 
+            {/* Window bar */}
             <div className="mb-3 flex items-center gap-2">
               <div className="h-3 w-3 rounded-full bg-red-400" />
               <div className="h-3 w-3 rounded-full bg-yellow-400" />
               <div className="h-3 w-3 rounded-full bg-green-400" />
             </div>
 
-            <div className="flex h-[320px] items-center justify-center rounded-lg bg-slate-100 text-slate-400">
-              Map Preview
+            {/* Map Preview */}
+            <div className="h-[320px] overflow-hidden rounded-lg">
+              <MapContainer
+                center={collegeCoords}
+                zoom={16}
+                scrollWheelZoom={false}
+                dragging={false}
+                doubleClickZoom={false}
+                zoomControl={false}
+                style={{ height: "100%", width: "100%" }}
+              >
+                <TileLayer
+                  attribution="&copy; OpenStreetMap contributors"
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+
+                <Marker position={collegeCoords}>
+                  <Popup>
+                    🚌 VVM’s S.G.R.E.E. Damodar College, Margao
+                  </Popup>
+                </Marker>
+              </MapContainer>
             </div>
 
           </div>
-
         </div>
 
       </div>
-
 
       {/* FEATURES */}
       <div className="mx-auto mt-32 grid max-w-6xl gap-8 md:grid-cols-3">
@@ -103,7 +134,6 @@ function Home() {
         </div>
 
       </div>
-
 
       {/* TRUST BAR */}
       <div className="mt-28 flex flex-wrap items-center justify-center gap-10 opacity-60">

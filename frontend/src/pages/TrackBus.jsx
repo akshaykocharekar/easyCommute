@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import {
   MapContainer,
@@ -13,12 +13,23 @@ import axios from "../api/axios";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
+/* FIX LEAFLET ICON BUG (important for production) */
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
+});
+
 /* BUS ICON */
 
 const busIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png",
-  shadowUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
   iconSize: [42, 42],
   iconAnchor: [21, 42],
   popupAnchor: [0, -36]
@@ -60,6 +71,10 @@ function TrackBus() {
   const [premiumRequired, setPremiumRequired] = useState(false);
   const [mapReady, setMapReady] = useState(false);
 
+  const animationRef = useRef(null);
+
+  /* RESET WHEN BUS CHANGES */
+
   useEffect(() => {
     setLocation(null);
     setSmoothLocation(null);
@@ -73,8 +88,13 @@ function TrackBus() {
 
   useEffect(() => {
 
-    const socket =
-      io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000");
+    const socketUrl =
+      import.meta.env.VITE_SOCKET_URL ||
+      window.location.origin;
+
+    const socket = io(socketUrl, {
+      transports: ["websocket"]
+    });
 
     socket.emit("joinBus", busId);
 
@@ -91,13 +111,16 @@ function TrackBus() {
 
         if (!smoothLocation) setSmoothLocation(newLocation);
         else animateMovement(newLocation);
+
       }
 
     });
 
-    return () => socket.disconnect();
+    return () => {
+      socket.disconnect();
+    };
 
-  }, [busId]);
+  }, [busId, smoothLocation]);
 
   /* INITIAL DATA LOAD */
 
@@ -150,7 +173,7 @@ function TrackBus() {
 
   const animateMovement = (target) => {
 
-    let frame;
+    cancelAnimationFrame(animationRef.current);
 
     const animate = () => {
 
@@ -165,7 +188,7 @@ function TrackBus() {
           Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
 
         if (distance < 0.00001) {
-          cancelAnimationFrame(frame);
+          cancelAnimationFrame(animationRef.current);
           return target;
         }
 
@@ -176,10 +199,10 @@ function TrackBus() {
 
       });
 
-      frame = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animate);
     };
 
-    frame = requestAnimationFrame(animate);
+    animationRef.current = requestAnimationFrame(animate);
   };
 
   const stopCoordinates =
@@ -247,11 +270,6 @@ function TrackBus() {
           center={mapCenter}
           zoom={14}
           scrollWheelZoom={true}
-          touchZoom={true}
-          doubleClickZoom={true}
-          dragging={true}
-          zoomControl={true}
-          inertia={true}
           style={{ height: "100%", width: "100%" }}
           whenReady={() => setMapReady(true)}
         >
@@ -259,8 +277,6 @@ function TrackBus() {
           {smoothLocation && <FollowBus location={smoothLocation} />}
 
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-          {/* BUS MARKER */}
 
           {smoothLocation && (
             <Marker
@@ -274,8 +290,6 @@ function TrackBus() {
             </Marker>
           )}
 
-          {/* ROUTE LINE */}
-
           {hasRouteGeometry && (
             <Polyline
               positions={stopCoordinates}
@@ -287,8 +301,6 @@ function TrackBus() {
             />
           )}
 
-          {/* NEXT STOP */}
-
           {nextStop && (
             <Marker
               position={[nextStop.latitude, nextStop.longitude]}
@@ -297,8 +309,6 @@ function TrackBus() {
               <Popup>Next Stop: {nextStop.name}</Popup>
             </Marker>
           )}
-
-          {/* ALL STOPS */}
 
           {route?.stops?.map((stop, i) => (
             <Marker

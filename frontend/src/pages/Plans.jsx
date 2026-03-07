@@ -10,29 +10,60 @@ function Plans() {
   }
 
   return (
-    <div style={{ padding: "40px" }}>
+    <div className="relative min-h-screen bg-white px-6 py-20">
 
-      <h1>Subscription Plans</h1>
+      {/* Background glow */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-40 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-emerald-300/30 blur-[120px]" />
+      </div>
 
-      <div style={{
-        border: "1px solid #ccc",
-        padding: "20px",
-        width: "300px"
-      }}>
+      <div className="mx-auto max-w-5xl text-center">
 
-        <h2>Premium</h2>
+        <h1 className="text-4xl font-semibold text-slate-900">
+          Choose your plan
+        </h1>
 
-        <p>₹500 / month</p>
+        <p className="mt-4 text-slate-600">
+          Unlock smart commuting with real-time transport insights.
+        </p>
 
-        <ul>
-          <li>Live Bus Tracking</li>
-          <li>ETA Predictions</li>
-          <li>Nearby Buses</li>
-        </ul>
+        {/* Pricing Card */}
+        <div className="mt-16 flex justify-center">
 
-        <Link to="/upgrade">
-          <button>Upgrade</button>
-        </Link>
+          <div className="relative w-[340px] rounded-2xl border border-slate-200 bg-white p-8 shadow-lg transition hover:shadow-xl">
+
+            {/* Popular badge */}
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
+              Most Popular
+            </span>
+
+            <h2 className="text-xl font-semibold text-slate-900">
+              Premium
+            </h2>
+
+            <p className="mt-4 text-4xl font-bold text-slate-900">
+              ₹500
+              <span className="text-base font-medium text-slate-500">
+                /month
+              </span>
+            </p>
+
+            <ul className="mt-8 space-y-3 text-left text-slate-600">
+              <li>✔ Live Bus Tracking</li>
+              <li>✔ ETA Predictions</li>
+              <li>✔ Nearby Buses</li>
+              <li>✔ Priority Features</li>
+            </ul>
+
+            <Link to="/upgrade">
+              <button className="mt-8 w-full rounded-lg bg-black py-3 text-sm font-medium text-white transition hover:opacity-90">
+                Upgrade to Premium
+              </button>
+            </Link>
+
+          </div>
+
+        </div>
 
       </div>
 
