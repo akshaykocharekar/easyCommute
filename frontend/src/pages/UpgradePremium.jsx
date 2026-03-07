@@ -78,17 +78,67 @@ function UpgradePremium() {
 
   };
 
-  return (
-    <div>
+return (
+  <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
 
-      <h1>Upgrade to Premium</h1>
+    <div className="max-w-md w-full rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
 
-      <button onClick={upgradePremium}>
-        Pay ₹500
+      <h1 className="text-2xl font-semibold text-slate-900 text-center">
+        Upgrade to Premium
+      </h1>
+
+      <p className="text-sm text-slate-500 text-center mt-2">
+        Unlock advanced transport features
+      </p>
+
+      {/* Features */}
+
+      <div className="mt-6 space-y-3 text-sm text-slate-600">
+
+        <div className="flex items-center gap-2">
+          <span>📍</span>
+          <p>Nearby bus tracking</p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span>⚡</span>
+          <p>Real-time bus locations</p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span>🗺</span>
+          <p>Advanced route search</p>
+        </div>
+
+      </div>
+
+      {/* Price */}
+
+      <div className="mt-6 text-center">
+
+        <p className="text-3xl font-semibold text-slate-900">
+          ₹30
+        </p>
+
+        <p className="text-xs text-slate-500">
+          One time payment
+        </p>
+
+      </div>
+
+      {/* Button */}
+
+      <button
+        onClick={upgradePremium}
+        className="mt-6 w-full rounded-full bg-emerald-500 py-3 text-sm font-medium text-white hover:bg-emerald-400 transition"
+      >
+        Pay with Razorpay
       </button>
 
     </div>
-  );
+
+  </div>
+);
 }
 
 export default UpgradePremium;

@@ -11,7 +11,7 @@ exports.createOrder = async (req, res) => {
   try {
 
     const options = {
-      amount: 50000, // ₹500
+      amount: 3000, // ₹30
       currency: "INR",
       receipt: "premium_subscription",
     };
