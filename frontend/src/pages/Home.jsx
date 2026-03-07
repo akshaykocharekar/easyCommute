@@ -88,7 +88,7 @@ function Home() {
 
               <MapContainer
                 center={collegeCoords}
-                zoom={16}
+                zoom={3}
                 scrollWheelZoom={false}
                 dragging={false}
                 doubleClickZoom={false}
