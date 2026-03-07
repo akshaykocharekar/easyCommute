@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://easycommute.onrender.com",
+  baseURL: "https://easycommute.onrender.com/api",
   withCredentials: true,
 });
 
