@@ -42,7 +42,7 @@ function Plans() {
             </h2>
 
             <p className="mt-4 text-4xl font-bold text-slate-900">
-              ₹500
+              ₹30
               <span className="text-base font-medium text-slate-500">
                 /month
               </span>
