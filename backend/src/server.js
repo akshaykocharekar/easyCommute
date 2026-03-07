@@ -10,7 +10,7 @@ connectDB();
 
 const io = new Server(server, {
   cors: {
-    origin: "*"
+    origin: "https://easy-commute-one.vercel.app/"
   }
 });
 
