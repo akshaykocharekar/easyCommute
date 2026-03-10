@@ -4,3 +4,9 @@
   height: 100%;
   width: 100%;
 }
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .pb-safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 5rem);
+  }
+}

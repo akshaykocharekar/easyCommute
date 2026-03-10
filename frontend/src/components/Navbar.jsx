@@ -12,6 +12,8 @@ function Navbar() {
   const isUser = token && user?.role === "USER";
   const isOperator = token && user?.role === "BUS_OPERATOR";
   const isAdmin = token && user?.role === "SUPER_ADMIN";
+  const isPremium =
+    user?.subscriptionPlan === "PREMIUM" && user?.subscriptionStatus === "ACTIVE";
 
   const navLinks = [];
 
@@ -25,7 +27,7 @@ function Navbar() {
       { to: "/dashboard", label: "Dashboard" },
       { to: "/search", label: "Search Routes" },
       { to: "/nearby", label: "Nearby Buses" },
-      { to: "/plans", label: "Plans" }
+      ...(isPremium ? [] : [{ to: "/plans", label: "Plans" }])
     );
   } else if (isOperator) {
     navLinks.push({ to: "/operator", label: "Operator Panel" });

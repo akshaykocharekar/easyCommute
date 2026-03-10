@@ -11,6 +11,8 @@ function BottomNav() {
 
   const isUser = user?.role === "USER";
   const isOperator = user?.role === "BUS_OPERATOR";
+  const isPremium =
+    user?.subscriptionPlan === "PREMIUM" && user?.subscriptionStatus === "ACTIVE";
 
   let items = [];
 
@@ -19,7 +21,7 @@ function BottomNav() {
       { to: "/dashboard", label: "Home", icon: Home },
       { to: "/search", label: "Search", icon: Search },
       { to: "/nearby", label: "Nearby", icon: MapPin },
-      { to: "/plans", label: "Plans", icon: CreditCard },
+      ...(isPremium ? [] : [{ to: "/plans", label: "Plans", icon: CreditCard }]),
     ];
   } else if (isOperator) {
     items = [

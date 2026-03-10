@@ -89,6 +89,48 @@ exports.getOperators = async (req, res) => {
   }
 };
 
+exports.verifyOperator = async (req, res) => {
+  try {
+    const operatorId = req.params.id;
+    const operator = await User.findById(operatorId);
+
+    if (!operator || operator.role !== "BUS_OPERATOR") {
+      return res.status(404).json({ message: "Operator not found" });
+    }
+
+    operator.operatorVerificationStatus = "VERIFIED";
+    operator.operatorVerifiedAt = new Date();
+    operator.operatorRejectedAt = undefined;
+    operator.operatorRejectionReason = "";
+    await operator.save();
+
+    res.json({ message: "Operator verified", operator });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.rejectOperator = async (req, res) => {
+  try {
+    const operatorId = req.params.id;
+    const { reason } = req.body;
+    const operator = await User.findById(operatorId);
+
+    if (!operator || operator.role !== "BUS_OPERATOR") {
+      return res.status(404).json({ message: "Operator not found" });
+    }
+
+    operator.operatorVerificationStatus = "REJECTED";
+    operator.operatorRejectedAt = new Date();
+    operator.operatorRejectionReason = String(reason || "").trim();
+    await operator.save();
+
+    res.json({ message: "Operator rejected", operator });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 /* =========================
    Integrity Report (Admin)
 ========================= */

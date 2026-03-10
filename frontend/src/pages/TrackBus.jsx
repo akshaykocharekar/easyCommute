@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { io } from "socket.io-client";
 import {
   MapContainer,
@@ -12,6 +12,7 @@ import L from "leaflet";
 import axios from "../api/axios";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { AuthContext } from "../context/AuthContext";
 
 /* FIX LEAFLET ICON BUG (important for production) */
 
@@ -61,6 +62,9 @@ function FollowBus({ location }) {
 }
 
 function TrackBus() {
+  const { user } = useContext(AuthContext);
+  const isPremium =
+    user?.subscriptionPlan === "PREMIUM" && user?.subscriptionStatus === "ACTIVE";
 
   const { busId } = useParams();
 
@@ -221,11 +225,13 @@ function TrackBus() {
         <p className="mt-2 text-slate-600">
           Live tracking is available for premium users.
         </p>
-        <Link to="/plans">
-          <button className="mt-4 rounded-full bg-emerald-500 px-6 py-2 text-white">
-            View Plans
-          </button>
-        </Link>
+        {!isPremium && (
+          <Link to="/plans">
+            <button className="mt-4 rounded-full bg-emerald-500 px-6 py-2 text-white">
+              View Plans
+            </button>
+          </Link>
+        )}
       </div>
     );
   }

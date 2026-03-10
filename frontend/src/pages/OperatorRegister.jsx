@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { registerUser } from "../services/authService";
-import { useNavigate, Link } from "react-router-dom";
+import { registerOperator } from "../services/authService";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-function Register() {
-
+function OperatorRegister() {
   const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,17 +14,14 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setLoading(true);
 
     try {
-      await registerUser({ name, email, password });
-
-      toast.success("Registration successful");
-
+      await registerOperator({ name, phone, email, password });
+      toast.success("Registration submitted. Await admin verification.");
       navigate("/login");
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Registration failed");
+      toast.error(error?.response?.data?.message || "Operator registration failed");
     } finally {
       setLoading(false);
     }
@@ -32,27 +29,29 @@ function Register() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-
-        {/* Header */}
         <h2 className="text-2xl font-semibold text-slate-900">
-          Create Account
+          Operator Registration
         </h2>
-
         <p className="mt-1 text-sm text-slate-500">
-          Join the smart bus tracking system
+          Register as an operator. Admin verification is required before assignment.
         </p>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-
           <input
             type="text"
             placeholder="Full Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+            className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+          />
+
+          <input
+            type="tel"
+            placeholder="Phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-200"
           />
 
@@ -77,35 +76,22 @@ function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-full bg-emerald-500 py-2 text-sm font-medium text-white hover:bg-emerald-400 disabled:opacity-50"
+            className="w-full rounded-full bg-slate-900 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
           >
-            {loading ? "Creating account..." : "Register"}
+            {loading ? "Submitting..." : "Register as Operator"}
           </button>
-
         </form>
 
-        {/* Footer */}
-        <p className="mt-6 text-sm text-slate-500 text-center">
+        <div className="mt-6 text-center text-sm text-slate-500">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-emerald-600 hover:underline"
-          >
+          <Link to="/login" className="text-emerald-600 hover:underline">
             Login
           </Link>
-        </p>
-
-        <p className="mt-2 text-sm text-slate-500 text-center">
-          Registering as an operator?{" "}
-          <Link to="/register-operator" className="text-emerald-600 hover:underline">
-            Operator Signup
-          </Link>
-        </p>
-
+        </div>
       </div>
-
     </div>
   );
 }
 
-export default Register;
+export default OperatorRegister;
+

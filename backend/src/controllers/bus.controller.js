@@ -99,6 +99,18 @@ exports.approveBus = async (req, res) => {
       });
     }
 
+    const operator = await User.findById(bus.operator).select(
+      "role operatorVerificationStatus"
+    );
+    if (!operator || operator.role !== "BUS_OPERATOR") {
+      return res.status(400).json({ message: "Assigned operator is invalid" });
+    }
+    if (operator.operatorVerificationStatus !== "VERIFIED") {
+      return res.status(400).json({
+        message: "Operator must be verified before activating the bus",
+      });
+    }
+
     bus.isApproved = true;
     bus.status = "ACTIVE";
     await bus.save();
@@ -107,7 +119,7 @@ exports.approveBus = async (req, res) => {
       message: "Bus activated successfully",
       bus: await Bus.findById(busId)
         .populate("route")
-        .populate("operator", "name email"),
+        .populate("operator", "name email phone operatorVerificationStatus"),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -172,6 +184,11 @@ exports.assignOperatorToBus = async (req, res) => {
         message: "User must have BUS_OPERATOR role",
       });
     }
+    if (operator.operatorVerificationStatus !== "VERIFIED") {
+      return res.status(400).json({
+        message: "Operator must be verified before assignment",
+      });
+    }
 
     const route = await Route.findById(bus.route);
     if (!route) {
@@ -200,7 +217,9 @@ exports.assignOperatorToBus = async (req, res) => {
 
     res.json({
       message: "Operator assigned successfully",
-      bus,
+      bus: await Bus.findById(busId)
+        .populate("route")
+        .populate("operator", "name email phone operatorVerificationStatus"),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

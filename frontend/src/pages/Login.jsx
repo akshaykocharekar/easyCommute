@@ -2,10 +2,12 @@ import { useState, useContext } from "react";
 import { loginUser } from "../services/authService";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -14,9 +16,11 @@ function Login() {
     e.preventDefault();
 
     try {
+      setLoading(true);
       const data = await loginUser({ email, password });
 
       login(data.token, data.user);
+      toast.success("Welcome back");
 
       if (data.user.role === "SUPER_ADMIN") {
         navigate("/admin");
@@ -28,7 +32,9 @@ function Login() {
 
     } catch (error) {
       console.error(error);
-      alert("Login failed. Please check your credentials.");
+      toast.error(error?.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,9 +82,10 @@ function Login() {
 
           <button
             type="submit"
-            className="mt-2 rounded-full bg-black py-2 text-sm font-medium text-white transition hover:opacity-80"
+            disabled={loading}
+            className="mt-2 rounded-full bg-black py-2 text-sm font-medium text-white transition hover:opacity-80 disabled:opacity-60"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
@@ -90,6 +97,13 @@ function Login() {
             className="font-medium text-emerald-600 hover:underline"
           >
             Register
+          </Link>
+        </p>
+
+        <p className="mt-2 text-center text-sm text-slate-500">
+          Are you an operator?{" "}
+          <Link to="/register-operator" className="font-medium text-emerald-600 hover:underline">
+            Register as Operator
           </Link>
         </p>
 

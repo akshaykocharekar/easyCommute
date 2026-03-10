@@ -8,6 +8,7 @@ import {
   Bus,
   Users,
   UserCog,
+  MessageSquareText,
   Menu,
   X
 } from "lucide-react";
@@ -26,6 +27,7 @@ function DashboardLayout() {
     { to: "/admin/assign-route", label: "Assign Route", icon: Bus },
     { to: "/admin/approve-buses", label: "Approve Buses", icon: Bus },
     { to: "/admin/operators", label: "Operators", icon: UserCog },
+    { to: "/admin/support", label: "Support", icon: MessageSquareText },
     { to: "/admin/users", label: "Users", icon: Users }
   ];
 

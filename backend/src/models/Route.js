@@ -29,6 +29,20 @@ const routeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    scheduleStartTime: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    estimatedDurationMinutes: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    bidirectional: {
+      type: Boolean,
+      default: true,
+    },
     stops: [
       {
         name: String,

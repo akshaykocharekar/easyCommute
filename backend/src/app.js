@@ -35,6 +35,7 @@ app.use("/api/nearby", require("./routes/nearby.routes"));
 app.use("/api/search", require("./routes/search.routes"));
 app.use("/api/subscription", require("./routes/subscription.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
+app.use("/api/support", require("./routes/support.routes"));
 
 // 404 handler
 app.use((req, res) => {

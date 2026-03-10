@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 function UpgradePremium() {
   const { user, updateUser } = useContext(AuthContext);
@@ -32,7 +33,7 @@ function UpgradePremium() {
       );
 
       if (!scriptLoaded) {
-        alert("Razorpay SDK failed to load.");
+        toast.error("Razorpay SDK failed to load.");
         return;
       }
 
@@ -55,7 +56,7 @@ function UpgradePremium() {
               subscriptionStatus: data.user.subscriptionStatus,
             });
           }
-          alert("Premium activated!");
+          toast.success("Premium activated");
           navigate("/dashboard", { replace: true });
 
         },
@@ -72,7 +73,7 @@ function UpgradePremium() {
     } catch (error) {
 
       console.error(error);
-      alert("Payment failed");
+      toast.error("Payment failed");
 
     }
 

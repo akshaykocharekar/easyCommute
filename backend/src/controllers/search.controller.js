@@ -12,14 +12,35 @@ exports.searchRoutes = async (req, res) => {
       });
     }
 
-    const routes = await Route.find({
+    const sourceEscaped = String(source).trim();
+    const destinationEscaped = String(destination).trim();
+
+    // Primary match: route endpoints (supports bidirectional routes)
+    const endpointMatch = {
+      $or: [
+        {
+          startPoint: { $regex: `^${sourceEscaped}$`, $options: "i" },
+          endPoint: { $regex: `^${destinationEscaped}$`, $options: "i" },
+        },
+        {
+          bidirectional: true,
+          startPoint: { $regex: `^${destinationEscaped}$`, $options: "i" },
+          endPoint: { $regex: `^${sourceEscaped}$`, $options: "i" },
+        },
+      ],
+    };
+
+    // Fallback match: stops contain both terms (keeps existing behavior working)
+    const stopsMatch = {
       stops: {
         $all: [
-          { $elemMatch: { name: { $regex: source, $options: "i" } } },
-          { $elemMatch: { name: { $regex: destination, $options: "i" } } }
-        ]
-      }
-    });
+          { $elemMatch: { name: { $regex: sourceEscaped, $options: "i" } } },
+          { $elemMatch: { name: { $regex: destinationEscaped, $options: "i" } } },
+        ],
+      },
+    };
+
+    const routes = await Route.find({ $or: [endpointMatch, stopsMatch] });
 
     if (routes.length === 0) {
       return res.json([]);
@@ -31,7 +52,7 @@ exports.searchRoutes = async (req, res) => {
       route: { $in: routeIds },
       status: "ACTIVE",
       isApproved: true
-    });
+    }).populate("route");
 
     res.json(buses);
 

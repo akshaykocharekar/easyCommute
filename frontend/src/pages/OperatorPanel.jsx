@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "../api/axios";
 import { motion } from "framer-motion";
 import { MapPin, Users, Play, Square } from "lucide-react";
+import { AuthContext } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 function OperatorPanel() {
   const [latitude, setLatitude] = useState("");
@@ -18,6 +20,16 @@ function OperatorPanel() {
   const [assignedRoute, setAssignedRoute] = useState(null);
   const [contextLoading, setContextLoading] = useState(true);
   const [contextError, setContextError] = useState(null);
+
+  const { user } = useContext(AuthContext);
+
+  // Support request form + history
+  const [supportCategory, setSupportCategory] = useState("OTHER");
+  const [supportSubject, setSupportSubject] = useState("");
+  const [supportMessage, setSupportMessage] = useState("");
+  const [supportBusy, setSupportBusy] = useState(false);
+  const [supportRequests, setSupportRequests] = useState([]);
+  const [supportLoading, setSupportLoading] = useState(true);
 
   useEffect(() => {
     const fetchContext = async () => {
@@ -42,6 +54,20 @@ function OperatorPanel() {
     };
 
     fetchContext();
+  }, []);
+
+  useEffect(() => {
+    const loadMyRequests = async () => {
+      try {
+        const res = await axios.get("/support/mine");
+        setSupportRequests(res.data);
+      } catch {
+        setSupportRequests([]);
+      } finally {
+        setSupportLoading(false);
+      }
+    };
+    loadMyRequests();
   }, []);
 
   /* ======================
@@ -103,11 +129,11 @@ function OperatorPanel() {
         longitude
       });
 
-      alert("Location updated");
+      toast.success("Location updated");
 
     } catch (err) {
 
-      alert(err.response?.data?.message || "Failed to update location");
+      toast.error(err.response?.data?.message || "Failed to update location");
 
     }
 
@@ -127,11 +153,11 @@ function OperatorPanel() {
         occupancy
       });
 
-      alert("Occupancy updated");
+      toast.success("Occupancy updated");
 
     } catch (err) {
 
-      alert(err.response?.data?.message || "Failed");
+      toast.error(err.response?.data?.message || "Failed");
 
     } finally {
 
@@ -139,6 +165,33 @@ function OperatorPanel() {
 
     }
 
+  };
+
+  const submitSupportRequest = async (e) => {
+    e.preventDefault();
+    if (!supportSubject.trim() || !supportMessage.trim()) {
+      toast.error("Please enter subject and message");
+      return;
+    }
+
+    try {
+      setSupportBusy(true);
+      await axios.post("/support", {
+        category: supportCategory,
+        subject: supportSubject,
+        message: supportMessage,
+      });
+      toast.success("Request sent to admin");
+      setSupportSubject("");
+      setSupportMessage("");
+
+      const res = await axios.get("/support/mine");
+      setSupportRequests(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to send request");
+    } finally {
+      setSupportBusy(false);
+    }
   };
 
   return (
@@ -153,6 +206,15 @@ function OperatorPanel() {
       <p className="text-sm text-slate-500">
         Manage live bus tracking and passenger occupancy
       </p>
+
+      {user?.operatorVerificationStatus && user.operatorVerificationStatus !== "VERIFIED" && (
+        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <div className="font-semibold">Verification pending</div>
+          <div className="mt-1 text-amber-800">
+            Your account must be verified by admin before you can be assigned to a bus and go live.
+          </div>
+        </div>
+      )}
 
       {/* TRIP CONTROL */}
 
@@ -212,9 +274,7 @@ function OperatorPanel() {
             <button
               onClick={() => {
                 if (!assignedBus) {
-                  alert(
-                    "You don't have a bus assigned yet. Please ask the admin to assign a bus before starting a trip."
-                  );
+                  toast.error("No bus assigned yet. Ask admin to assign a bus.");
                   return;
                 }
                 setTripActive(true);
@@ -323,6 +383,76 @@ function OperatorPanel() {
           {loadingOccupancy ? "Updating..." : "Update Occupancy"}
         </button>
 
+      </div>
+
+      {/* CONTACT ADMIN */}
+      <div className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
+        <h2 className="text-sm font-semibold text-slate-900">Contact Admin</h2>
+        <p className="mt-1 text-xs text-slate-500">
+          Request route changes, bus detail updates, or report issues.
+        </p>
+
+        <form onSubmit={submitSupportRequest} className="mt-4 space-y-3">
+          <select
+            value={supportCategory}
+            onChange={(e) => setSupportCategory(e.target.value)}
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+          >
+            <option value="ROUTE_CHANGE">Route change</option>
+            <option value="BUS_DETAIL_CHANGE">Bus detail change</option>
+            <option value="OTHER">Other</option>
+          </select>
+
+          <input
+            value={supportSubject}
+            onChange={(e) => setSupportSubject(e.target.value)}
+            placeholder="Subject"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+          />
+
+          <textarea
+            value={supportMessage}
+            onChange={(e) => setSupportMessage(e.target.value)}
+            placeholder="Message"
+            rows={4}
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+          />
+
+          <button
+            type="submit"
+            disabled={supportBusy}
+            className="w-full rounded-xl bg-emerald-600 py-2 text-sm text-white disabled:opacity-60"
+          >
+            {supportBusy ? "Sending..." : "Send request"}
+          </button>
+        </form>
+
+        <div className="mt-5">
+          <div className="text-xs font-medium text-slate-500">My requests</div>
+          {supportLoading ? (
+            <div className="mt-2 text-sm text-slate-500">Loading…</div>
+          ) : supportRequests.length === 0 ? (
+            <div className="mt-2 text-sm text-slate-500">No requests yet.</div>
+          ) : (
+            <div className="mt-2 space-y-2">
+              {supportRequests.slice(0, 5).map((r) => (
+                <div key={r._id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-sm font-medium text-slate-900 truncate">
+                      {r.subject}
+                    </div>
+                    <div className="text-[10px] font-medium text-slate-600">
+                      {r.status}
+                    </div>
+                  </div>
+                  <div className="mt-1 text-xs text-slate-600 line-clamp-2">
+                    {r.message}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
     </div>

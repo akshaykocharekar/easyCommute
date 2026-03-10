@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="EasyCommute icon (maskable)">
+  <!-- Maskable icons need a safe padding area; use a solid background. -->
+  <rect width="512" height="512" fill="#059669"/>
+  <g transform="translate(64 64)">
+    <rect width="384" height="384" rx="96" fill="#10b981"/>
+    <path d="M96 132c0-22.1 17.9-40 40-40h112c22.1 0 40 17.9 40 40v128c0 19.9-16.1 36-36 36h-6v18c0 9.9-8.1 18-18 18s-18-8.1-18-18v-18H178v18c0 9.9-8.1 18-18 18s-18-8.1-18-18v-18h-6c-19.9 0-36-16.1-36-36V132z" fill="#fff" opacity="0.95"/>
+    <path d="M132 138h120c8.8 0 16 7.2 16 16v36H116v-36c0-8.8 7.2-16 16-16z" fill="#eafff7"/>
+    <circle cx="152" cy="280" r="16" fill="#0f172a" opacity="0.85"/>
+    <circle cx="232" cy="280" r="16" fill="#0f172a" opacity="0.85"/>
+    <path d="M116 206h152v20c0 8.8-7.2 16-16 16H132c-8.8 0-16-7.2-16-16v-20z" fill="#eafff7"/>
+  </g>
+</svg>
+

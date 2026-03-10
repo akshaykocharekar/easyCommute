@@ -145,7 +145,22 @@ function AdminBuses() {
 
                 <div className="flex justify-between">
                   <span>Operator</span>
-                  <span>{bus.operator?.name || "—"}</span>
+                  <span className="text-right">
+                    {bus.operator?.name || "—"}
+                    {bus.operator?.operatorVerificationStatus && (
+                      <span
+                        className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                          bus.operator.operatorVerificationStatus === "VERIFIED"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : bus.operator.operatorVerificationStatus === "REJECTED"
+                              ? "bg-rose-100 text-rose-700"
+                              : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {bus.operator.operatorVerificationStatus}
+                      </span>
+                    )}
+                  </span>
                 </div>
 
               </div>

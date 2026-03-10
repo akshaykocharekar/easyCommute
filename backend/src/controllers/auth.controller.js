@@ -29,6 +29,35 @@ exports.register = async (req, res) => {
   }
 };
 
+// OPERATOR REGISTER - creates BUS_OPERATOR in PENDING verification state
+exports.registerOperator = async (req, res) => {
+  try {
+    const { name, email, phone, password } = req.body;
+
+    const userExists = await User.findOne({ email });
+    if (userExists)
+      return res.status(400).json({ message: "User already exists" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const operator = await User.create({
+      name,
+      email,
+      phone: String(phone || "").trim(),
+      password: hashedPassword,
+      role: "BUS_OPERATOR",
+      operatorVerificationStatus: "PENDING",
+    });
+
+    res.status(201).json({
+      message: "Operator registered successfully. Await admin verification.",
+      userId: operator._id,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // LOGIN
 exports.login = async (req, res) => {
   try {
@@ -53,9 +82,11 @@ exports.login = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
         role: user.role,
         subscriptionPlan: user.subscriptionPlan,
         subscriptionStatus: user.subscriptionStatus,
+        operatorVerificationStatus: user.operatorVerificationStatus,
       },
     });
   } catch (error) {

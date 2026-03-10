@@ -3,11 +3,32 @@ import axios from "../api/axios";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import PageShell from "../components/PageShell";
+import toast from "react-hot-toast";
+
+const getVerificationChip = (status) => {
+  if (status === "VERIFIED") {
+    return {
+      label: "Verified",
+      className: "bg-emerald-100 text-emerald-700",
+    };
+  }
+  if (status === "REJECTED") {
+    return {
+      label: "Rejected",
+      className: "bg-rose-100 text-rose-700",
+    };
+  }
+  return {
+    label: "Pending",
+    className: "bg-amber-100 text-amber-800",
+  };
+};
 
 function AdminOperators() {
   const [operators, setOperators] = useState([]);
   const [buses, setBuses] = useState([]);
   const [selectedBus, setSelectedBus] = useState("");
+  const [busyOperatorId, setBusyOperatorId] = useState(null);
 
   const [searchParams] = useSearchParams();
   const preselectedBusId = searchParams.get("busId");
@@ -31,6 +52,31 @@ function AdminOperators() {
     setBuses(res.data);
   };
 
+  const verifyOperator = async (operatorId) => {
+    try {
+      setBusyOperatorId(operatorId);
+      await axios.patch(`/admin/operators/${operatorId}/verify`);
+      await fetchOperators();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to verify operator");
+    } finally {
+      setBusyOperatorId(null);
+    }
+  };
+
+  const rejectOperator = async (operatorId) => {
+    const reason = window.prompt("Reason for rejection? (optional)", "");
+    try {
+      setBusyOperatorId(operatorId);
+      await axios.patch(`/admin/operators/${operatorId}/reject`, { reason });
+      await fetchOperators();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to reject operator");
+    } finally {
+      setBusyOperatorId(null);
+    }
+  };
+
   const assignOperator = async (operatorId) => {
     try {
       await axios.post("/buses/assign-operator", {
@@ -40,7 +86,7 @@ function AdminOperators() {
 
       await fetchBuses();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to assign operator");
+      toast.error(err.response?.data?.message || "Failed to assign operator");
     }
   };
 
@@ -62,7 +108,7 @@ function AdminOperators() {
   return (
     <PageShell
       title="Assign Operators"
-      subtitle="Match drivers with buses ready for service"
+      subtitle="Verify operators, then assign them to buses ready for service"
     >
       {/* BUS SELECTOR */}
       <motion.div
@@ -101,6 +147,8 @@ function AdminOperators() {
         {operators.map((op) => {
 
           const assignedBus = operatorToBus.get(op._id);
+          const chip = getVerificationChip(op.operatorVerificationStatus);
+          const isVerified = op.operatorVerificationStatus === "VERIFIED";
 
           return (
             <motion.div
@@ -119,10 +167,18 @@ function AdminOperators() {
                 <p className="text-xs text-slate-500">
                   {op.email}
                 </p>
+                {op.phone && (
+                  <p className="text-xs text-slate-500">
+                    {op.phone}
+                  </p>
+                )}
               </div>
 
               {/* Status */}
               <div className="flex items-center gap-3">
+                <span className={`rounded-full px-3 py-1 text-xs font-medium ${chip.className}`}>
+                  {chip.label}
+                </span>
 
                 {assignedBus ? (
                   <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
@@ -135,11 +191,39 @@ function AdminOperators() {
                 )}
 
                 <button
-                  disabled={!selectedBus || assignedBus}
+                  disabled={busyOperatorId === op._id || isVerified}
+                  onClick={() => verifyOperator(op._id)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition
+                    ${
+                      busyOperatorId === op._id || isVerified
+                        ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                        : "bg-slate-900 text-white hover:bg-slate-800"
+                    }
+                  `}
+                >
+                  Verify
+                </button>
+
+                <button
+                  disabled={busyOperatorId === op._id || isVerified}
+                  onClick={() => rejectOperator(op._id)}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition
+                    ${
+                      busyOperatorId === op._id || isVerified
+                        ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                        : "border border-slate-300 text-slate-700 hover:bg-slate-50"
+                    }
+                  `}
+                >
+                  Reject
+                </button>
+
+                <button
+                  disabled={!selectedBus || assignedBus || !isVerified}
                   onClick={() => assignOperator(op._id)}
                   className={`rounded-full px-4 py-1.5 text-xs font-medium transition
                     ${
-                      !selectedBus || assignedBus
+                      !selectedBus || assignedBus || !isVerified
                         ? "bg-slate-200 text-slate-400 cursor-not-allowed"
                         : "bg-emerald-500 text-white hover:bg-emerald-400"
                     }

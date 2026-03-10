@@ -13,6 +13,12 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
 
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
     password: {
       type: String,
       required: true,
@@ -22,6 +28,26 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["SUPER_ADMIN", "BUS_OPERATOR", "USER"],
       default: "USER",
+    },
+
+    operatorVerificationStatus: {
+      type: String,
+      enum: ["PENDING", "VERIFIED", "REJECTED"],
+      default: "PENDING",
+    },
+
+    operatorVerifiedAt: {
+      type: Date,
+    },
+
+    operatorRejectedAt: {
+      type: Date,
+    },
+
+    operatorRejectionReason: {
+      type: String,
+      trim: true,
+      default: "",
     },
 
     subscriptionPlan: {
