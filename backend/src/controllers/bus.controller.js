@@ -229,30 +229,39 @@ exports.assignOperatorToBus = async (req, res) => {
 /* =========================
    Unassign Operator (Admin)
 ========================= */
+/* =========================
+   Unassign Operator (Admin)
+   Replace the existing exports.unassignOperatorFromBus with this
+========================= */
 exports.unassignOperatorFromBus = async (req, res) => {
   try {
     const { busId } = req.body;
+
+    if (!busId) {
+      return res.status(400).json({ message: "busId is required" });
+    }
+
     const bus = await Bus.findById(busId);
     if (!bus) return res.status(404).json({ message: "Bus not found" });
 
     if (bus.status !== "INACTIVE") {
       return res.status(400).json({
-        message: "Bus must be INACTIVE to unassign operator",
+        message: "Deactivate the bus before removing its operator",
       });
     }
 
-    if (!bus.operator) {
-      return res.json({ message: "No operator to unassign", bus });
-    }
-
-    bus.operator = null;
-    await bus.save();
-
-    const populatedBus = await Bus.findById(busId)
+    // Use findOneAndUpdate with $unset so Mongoose never touches the unique
+    // sparse index with a null write — it simply removes the field entirely,
+    // which is treated as "absent" by the sparse index (no conflict).
+    const updated = await Bus.findByIdAndUpdate(
+      busId,
+      { $unset: { operator: "" } },
+      { new: true }
+    )
       .populate("route")
       .populate("operator", "name email");
 
-    res.json({ message: "Operator unassigned successfully", bus: populatedBus });
+    res.json({ message: "Operator unassigned successfully", bus: updated });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -336,11 +345,18 @@ exports.updateOccupancy = async (req, res) => {
 /* =========================
    Get All Buses (Admin)
 ========================= */
+/* =========================
+   Get All Buses (Admin)
+   Replace the existing exports.getBuses with this
+========================= */
 exports.getBuses = async (req, res) => {
   try {
     const buses = await Bus.find()
       .populate("route")
-      .populate("operator", "name email");
+      .populate("operator", "name email phone operatorVerificationStatus");
+    //                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    // Must include operatorVerificationStatus so the frontend can check
+    // whether the operator is verified before enabling the Activate button.
 
     res.json(buses);
   } catch (error) {

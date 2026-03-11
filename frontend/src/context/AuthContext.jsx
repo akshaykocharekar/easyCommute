@@ -2,25 +2,24 @@ import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
+// Read synchronously so the very first render already has auth state.
+// This prevents the Home page flash for logged-in users.
+function getInitialToken() {
+  return localStorage.getItem("token") || null;
+}
+
+function getInitialUser() {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export const AuthProvider = ({ children }) => {
-
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-
-  useEffect(() => {
-
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-
-    if (savedToken) {
-      setToken(savedToken);
-    }
-
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-
-  }, []);
+  const [token, setToken] = useState(getInitialToken);
+  const [user,  setUser]  = useState(getInitialUser);
 
   const login = (newToken, userData) => {
     localStorage.setItem("token", newToken);
@@ -30,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (userData) => {
-    const saved = JSON.parse(localStorage.getItem("user") || "{}");
+    const saved  = JSON.parse(localStorage.getItem("user") || "{}");
     const merged = { ...saved, ...userData };
     localStorage.setItem("user", JSON.stringify(merged));
     setUser(merged);
@@ -48,5 +47,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-
 };

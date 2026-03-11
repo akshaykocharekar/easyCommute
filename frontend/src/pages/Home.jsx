@@ -1,226 +1,296 @@
-import { Link } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
-/* Fix default marker icon issue in React Leaflet */
-delete L.Icon.Default.prototype._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  iconUrl:
-    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  shadowUrl:
-    "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-});
+import { useContext } from "react";
+import { Link, Navigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 function Home() {
-  const collegeCoords = [15.2750, 73.9570];
+  const { token, user } = useContext(AuthContext);
+
+  if (token && user) {
+    if (user.role === "SUPER_ADMIN")  return <Navigate to="/admin"     replace />;
+    if (user.role === "BUS_OPERATOR") return <Navigate to="/operator"  replace />;
+    return                                   <Navigate to="/dashboard" replace />;
+  }
 
   return (
-    <div className="relative min-h-screen bg-slate-50 overflow-hidden px-6">
+    <div
+      className="min-h-screen text-slate-100"
+      style={{
+        backgroundColor: "#10221c",
+        fontFamily: "'Spline Sans', sans-serif",
+        backgroundImage: "radial-gradient(circle at 2px 2px, rgba(16,183,127,0.05) 1px, transparent 0)",
+        backgroundSize: "24px 24px",
+      }}
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap');
+        .glass-card {
+          background: rgba(255,255,255,0.03);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.1);
+          transition: border-color 0.2s;
+        }
+        .glass-card:hover { border-color: rgba(16,183,127,0.4); }
+        .material-symbols-outlined {
+          font-family: 'Material Symbols Outlined';
+          font-weight: normal; font-style: normal;
+          font-size: 24px; line-height: 1;
+          letter-spacing: normal; text-transform: none;
+          display: inline-block; white-space: nowrap;
+          word-wrap: normal; direction: ltr;
+        }
+      `}</style>
 
-      {/* Gradient Background Glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-[30%] h-[700px] w-[700px] -translate-x-1/2 rounded-full bg-emerald-300/30 blur-[150px]" />
-        <div className="absolute right-[10%] top-[40%] h-[500px] w-[500px] rounded-full bg-blue-300/30 blur-[130px]" />
-        <div className="absolute left-[10%] bottom-[10%] h-[500px] w-[500px] rounded-full bg-yellow-200/30 blur-[130px]" />
-      </div>
+      {/* ── HERO ── */}
+      <section className="relative overflow-hidden pt-12 pb-20 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
 
-      {/* HERO */}
-      <section className="mx-auto grid max-w-7xl items-center gap-16 pt-36 pb-28 md:grid-cols-2">
-
-        {/* LEFT TEXT */}
-        <div>
-
-          <p className="mb-4 text-sm font-semibold tracking-wide text-emerald-600">
-            PUBLIC TRANSPORT REINVENTED
-          </p>
-
-          <h1 className="text-5xl font-semibold tracking-tight text-slate-900 sm:text-6xl">
-            Track buses
-            <br />
-            <span className="text-emerald-600">in real time</span>
-          </h1>
-
-          <p className="mt-6 max-w-lg text-lg text-slate-600">
-            EasyCommute helps commuters discover nearby buses, track live
-            routes, and navigate public transport smarter.
-          </p>
-
-          <div className="mt-10 flex gap-4">
-
-            <Link to="/register">
-              <button className="rounded-full bg-black px-8 py-3 text-sm font-medium text-white transition hover:scale-105 hover:opacity-90">
-                Get Started
-              </button>
-            </Link>
-
-            <Link to="/login">
-              <button className="rounded-full border border-slate-300 px-8 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100">
-                Login
-              </button>
-            </Link>
-
-          </div>
-
-          <p className="mt-6 text-sm text-slate-500">
-            Live GPS • Nearby buses • Smart routes
-          </p>
-
-        </div>
-
-        {/* RIGHT PRODUCT PREVIEW */}
-        <div className="relative">
-
-          <div className="rounded-3xl border border-slate-200 bg-white/80 backdrop-blur p-4 shadow-2xl">
-
-            {/* Window bar */}
-            <div className="mb-3 flex items-center gap-2">
-              <div className="h-3 w-3 rounded-full bg-red-400" />
-              <div className="h-3 w-3 rounded-full bg-yellow-400" />
-              <div className="h-3 w-3 rounded-full bg-green-400" />
+          {/* Left text */}
+          <div className="flex-1 text-center lg:text-left">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest mb-6"
+              style={{ backgroundColor: "rgba(16,183,127,0.1)", borderColor: "rgba(16,183,127,0.2)", color: "#10b77f" }}
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: "#10b77f" }} />
+                <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#10b77f" }} />
+              </span>
+              Live in Goa
             </div>
 
-            {/* Map Preview */}
-            <div className="h-[350px] overflow-hidden rounded-xl">
+            <h1 className="text-5xl lg:text-7xl font-black text-white leading-tight mb-6 tracking-tight">
+              Know exactly when your{" "}
+              <span style={{ color: "#10b77f" }}>bus arrives</span>
+            </h1>
 
-              <MapContainer
-                center={collegeCoords}
-                zoom={3}
-                scrollWheelZoom={false}
-                dragging={false}
-                doubleClickZoom={false}
-                zoomControl={false}
-                style={{ height: "100%", width: "100%" }}
+            <p className="text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed">
+              Real-time GPS tracking for Goa's public transport. Never wait at the stand longer than you need to.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+              <Link to="/register" className="w-full sm:w-auto">
+                <button
+                  className="w-full px-8 py-4 font-bold rounded-xl text-lg transition-all hover:brightness-110"
+                  style={{ backgroundColor: "#10b77f", color: "#10221c" }}
+                >
+                  Get Started Free
+                </button>
+              </Link>
+              <Link to="/login" className="w-full sm:w-auto">
+                <button className="w-full px-8 py-4 border border-slate-700 text-white font-bold rounded-xl text-lg hover:bg-slate-800 transition-all">
+                  Login
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Right phone mockup */}
+          <div className="flex-1 relative flex justify-center">
+            <div className="relative mx-auto w-[280px] h-[520px] bg-slate-900 rounded-[3rem] border-8 border-slate-800 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-slate-800">
+                <div className="absolute inset-0 opacity-30" style={{
+                  background: "repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(16,183,127,0.1) 40px,rgba(16,183,127,0.1) 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(16,183,127,0.1) 40px,rgba(16,183,127,0.1) 41px)"
+                }} />
+              </div>
+              <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(16,34,28,0.8), transparent)" }} />
+
+              {/* Search bar */}
+              <div className="absolute top-10 left-4 right-4 bg-slate-900/90 backdrop-blur rounded-xl p-3 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined" style={{ color: "#10b77f" }}>search</span>
+                  <div className="h-4 w-32 bg-slate-700 rounded" />
+                </div>
+              </div>
+
+              {/* Bus marker */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                <div className="p-2 rounded-full shadow-lg" style={{ backgroundColor: "#10b77f" }}>
+                  <span className="material-symbols-outlined text-xl" style={{ color: "#10221c" }}>directions_bus</span>
+                </div>
+                <div className="mt-2 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-900 shadow-xl whitespace-nowrap">
+                  Kadamba Exp • 2m
+                </div>
+              </div>
+
+              {/* ETA card */}
+              <div className="absolute bottom-6 left-4 right-4 bg-slate-900/95 rounded-2xl p-4 border border-white/10">
+                <p className="text-xs text-slate-400 mb-1">Next arrival</p>
+                <p className="text-2xl font-black" style={{ color: "#10b77f" }}>2 min</p>
+                <p className="text-xs text-slate-400 mt-1">Panaji Bus Stand</p>
+              </div>
+            </div>
+
+            <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: "rgba(16,183,127,0.1)" }} />
+            <div className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: "rgba(16,183,127,0.05)" }} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── STATS ── */}
+      <section className="py-12 border-y" style={{ backgroundColor: "rgba(16,183,127,0.05)", borderColor: "rgba(16,183,127,0.1)" }}>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { value: "500+", label: "Active Buses" },
+              { value: "40+",  label: "Routes Covered" },
+              { value: "10k+", label: "Daily Commuters" },
+            ].map((s, i) => (
+              <div
+                key={s.label}
+                className={`text-center ${i === 1 ? "border-y md:border-y-0 md:border-x py-8 md:py-0" : ""}`}
+                style={i === 1 ? { borderColor: "rgba(16,183,127,0.1)" } : {}}
               >
-                <TileLayer
-                  attribution="&copy; OpenStreetMap contributors"
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+                <p className="text-4xl font-black text-white mb-1">{s.value}</p>
+                <p className="font-medium tracking-wide text-sm uppercase" style={{ color: "#10b77f" }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                <Marker position={collegeCoords}>
-                  <Popup>🚌 Damodar College Bus Stop</Popup>
-                </Marker>
+      {/* ── FEATURES ── */}
+      <section className="py-24 px-4">
+        <div className="max-w-7xl mx-auto text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Smart features for smart travelers</h2>
+          <p className="text-slate-400">Everything you need to navigate Goa's public transport like a pro.</p>
+        </div>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            { icon: "explore",     title: "Live Bus Tracking",  desc: "Pinpoint exact locations of Kadamba and private buses in real-time on our live interactive map." },
+            { icon: "location_on", title: "Nearby Buses",       desc: "Instantly find the nearest bus stands and upcoming departures based on your current GPS location." },
+            { icon: "route",       title: "Smart Route Search", desc: "Enter your destination and we'll calculate the fastest route, including transfers and total fare estimation." },
+          ].map((f) => (
+            <div key={f.title} className="glass-card p-8 rounded-2xl group">
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                style={{ backgroundColor: "rgba(16,183,127,0.2)" }}>
+                <span className="material-symbols-outlined text-3xl" style={{ color: "#10b77f", fontSize: "30px" }}>{f.icon}</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{f.title}</h3>
+              <p className="text-slate-400 leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-              </MapContainer>
+      {/* ── HOW IT WORKS ── */}
+      <section className="py-24 px-4" style={{ backgroundColor: "rgba(15,23,42,0.4)" }}>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-20">Track your bus in seconds</h2>
+          <div className="relative flex flex-col md:flex-row gap-12 items-start">
+            <div className="hidden md:block absolute top-10 left-0 w-full h-0.5 -z-10" style={{ backgroundColor: "rgba(16,183,127,0.2)" }} />
+            {[
+              { n: "1", title: "Register", desc: "Create an account to save your frequent routes and favorite stops." },
+              { n: "2", title: "Search",   desc: "Pick your destination and choose from the best available bus routes." },
+              { n: "3", title: "Track",    desc: "Watch your bus move on the map and get a notification when it's 2 mins away." },
+            ].map((step) => (
+              <div key={step.n} className="flex-1 flex flex-col items-center text-center">
+                <div
+                  className="w-20 h-20 rounded-full text-2xl font-black flex items-center justify-center mb-6 border-4"
+                  style={{ backgroundColor: "#10b77f", color: "#10221c", borderColor: "#10221c", boxShadow: "0 20px 40px rgba(16,183,127,0.2)" }}
+                >
+                  {step.n}
+                </div>
+                <h4 className="text-xl font-bold text-white mb-2">{step.title}</h4>
+                <p className="text-slate-400 text-sm">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
+      {/* ── PREMIUM ── */}
+      <section className="py-24 px-4">
+        <div
+          className="max-w-4xl mx-auto rounded-[2rem] border p-8 md:p-16 relative overflow-hidden"
+          style={{ background: "linear-gradient(135deg, #0f172a, #10221c)", borderColor: "rgba(16,183,127,0.3)" }}
+        >
+          <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: "rgba(16,183,127,0.1)" }} />
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
+            <div className="flex-1">
+              <div className="font-bold text-xs uppercase tracking-widest px-3 py-1 rounded-full w-max mb-4"
+                style={{ backgroundColor: "rgba(16,183,127,0.2)", color: "#10b77f" }}>
+                Premium Plan
+              </div>
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
+                Go Premium for <span style={{ color: "#10b77f" }}>Advanced Features</span>
+              </h2>
+              <ul className="space-y-4 mb-8">
+                {["Precise Live ETA for every stop", "Priority GPS data refresh", "Completely Ad-free experience"].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-slate-300">
+                    <span className="material-symbols-outlined" style={{ color: "#10b77f", fontSize: "20px" }}>check_circle</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/plans">
+                <button
+                  className="px-10 py-4 rounded-xl font-black text-lg transition-all hover:brightness-110"
+                  style={{ backgroundColor: "#10b77f", color: "#10221c" }}
+                >
+                  View Plans
+                </button>
+              </Link>
+            </div>
+            <div className="w-48 h-48 md:w-64 md:h-64 flex items-center justify-center rounded-full border-4 flex-shrink-0"
+              style={{ borderColor: "rgba(16,183,127,0.2)" }}>
+              <div className="w-40 h-40 md:w-52 md:h-52 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: "rgba(16,183,127,0.1)" }}>
+                <span className="material-symbols-outlined animate-pulse" style={{ color: "#10b77f", fontSize: "7rem" }}>star</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="bg-slate-900 pt-20 pb-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <span className="material-symbols-outlined text-3xl" style={{ color: "#10b77f", fontSize: "2rem" }}>directions_bus</span>
+                <span className="text-2xl font-bold tracking-tight text-white">EasyCommute</span>
+              </div>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Making Goa's public transport reliable and accessible for everyone. Tracking 500+ buses daily.
+              </p>
+            </div>
+
+            <div>
+              <h5 className="text-white font-bold mb-6">Quick Links</h5>
+              <ul className="space-y-4 text-slate-400 text-sm">
+                <li><Link to="/search"    className="hover:text-emerald-400 transition-colors">Bus Schedules</Link></li>
+                <li><Link to="/nearby"    className="hover:text-emerald-400 transition-colors">Nearby Buses</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 className="text-white font-bold mb-6">Account</h5>
+              <ul className="space-y-4 text-slate-400 text-sm">
+                <li><Link to="/login"             className="hover:text-emerald-400 transition-colors">Login</Link></li>
+                <li><Link to="/register"          className="hover:text-emerald-400 transition-colors">Register</Link></li>
+                <li><Link to="/plans"             className="hover:text-emerald-400 transition-colors">Premium Plans</Link></li>
+                <li><Link to="/register-operator" className="hover:text-emerald-400 transition-colors">Operator Portal</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 className="text-white font-bold mb-6">Support</h5>
+              <ul className="space-y-4 text-slate-400 text-sm">
+                <li className="text-slate-500">Help Center</li>
+                <li className="text-slate-500">Privacy Policy</li>
+                <li className="text-slate-500">Terms of Service</li>
+              </ul>
             </div>
 
           </div>
 
+          <div className="border-t border-white/5 pt-10 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs">
+            <p>© {new Date().getFullYear()} EasyCommute. All rights reserved. Not affiliated with Govt of Goa.</p>
+            <span>Designed for Goa</span>
+          </div>
         </div>
-
-      </section>
-
-      {/* FEATURES */}
-      <section className="mx-auto max-w-6xl pb-28">
-
-        <h2 className="text-center text-3xl font-semibold text-slate-900">
-          Built for modern commuting
-        </h2>
-
-        <p className="mt-3 text-center text-slate-600">
-          Everything you need to navigate public transport smarter
-        </p>
-
-        <div className="mt-14 grid gap-8 md:grid-cols-3">
-
-          <div className="rounded-2xl border border-slate-200 bg-white/70 backdrop-blur p-8 transition hover:shadow-lg">
-
-            <div className="text-2xl">🚌</div>
-
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">
-              Live Bus Tracking
-            </h3>
-
-            <p className="mt-3 text-slate-600">
-              See real-time GPS locations of buses and follow their movement live.
-            </p>
-
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white/70 backdrop-blur p-8 transition hover:shadow-lg">
-
-            <div className="text-2xl">📍</div>
-
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">
-              Nearby Buses
-            </h3>
-
-            <p className="mt-3 text-slate-600">
-              Instantly discover buses close to your location.
-            </p>
-
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white/70 backdrop-blur p-8 transition hover:shadow-lg">
-
-            <div className="text-2xl">🗺️</div>
-
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">
-              Smart Routes
-            </h3>
-
-            <p className="mt-3 text-slate-600">
-              Search routes and plan your commute with ease.
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* PRODUCT SECTION */}
-      <section className="bg-white py-28 border-y border-slate-200">
-
-        <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 md:grid-cols-2">
-
-          <div>
-
-            <h2 className="text-4xl font-semibold text-slate-900">
-              See buses moving live
-            </h2>
-
-            <p className="mt-4 text-slate-600">
-              EasyCommute provides real-time bus tracking so you always
-              know where your bus is and when it will arrive.
-            </p>
-
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-slate-100 p-10 text-center text-slate-400">
-            Live tracking preview
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* CTA */}
-      <section className="py-32 text-center">
-
-        <h2 className="text-4xl font-semibold text-slate-900">
-          Start commuting smarter
-        </h2>
-
-        <p className="mt-4 text-slate-600">
-          Join EasyCommute and experience real-time public transport.
-        </p>
-
-        <Link to="/register">
-          <button className="mt-8 rounded-full bg-black px-8 py-3 text-white transition hover:scale-105">
-            Get Started
-          </button>
-        </Link>
-
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-slate-200 py-10 text-center text-sm text-slate-500">
-        © {new Date().getFullYear()} EasyCommute. All rights reserved.
       </footer>
 
     </div>

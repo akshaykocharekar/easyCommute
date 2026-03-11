@@ -30,7 +30,7 @@ const AdminIntegrity = lazy(() => import("./pages/AdminIntegrity"));
 const AdminSupport = lazy(() => import("./pages/AdminSupport"));
 
 const CreateBus = lazy(() => import("./pages/CreateBus"));
-const ApproveBuses = lazy(() => import("./pages/ApproveBuses"));
+
 const AssignRoute = lazy(() => import("./pages/AssignRoute"));
 const CreateRoute = lazy(() => import("./pages/CreateRoute"));
 const AddStop = lazy(() => import("./pages/AddStop"));
@@ -193,7 +193,7 @@ function App() {
               <Route path="create-bus" element={<CreateBus />} />
               <Route path="create-route" element={<CreateRoute />} />
               <Route path="assign-route" element={<AssignRoute />} />
-              <Route path="approve-buses" element={<ApproveBuses />} />
+              
               <Route path="add-stop" element={<AddStop />} />
               <Route path="users" element={<AdminUsers />} />
             </Route>

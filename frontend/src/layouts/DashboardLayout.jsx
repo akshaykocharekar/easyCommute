@@ -25,7 +25,7 @@ function DashboardLayout() {
     { to: "/admin/buses", label: "Buses", icon: Bus },
     { to: "/admin/create-bus", label: "Create Bus", icon: Bus },
     { to: "/admin/assign-route", label: "Assign Route", icon: Bus },
-    { to: "/admin/approve-buses", label: "Approve Buses", icon: Bus },
+   
     { to: "/admin/operators", label: "Operators", icon: UserCog },
     { to: "/admin/support", label: "Support", icon: MessageSquareText },
     { to: "/admin/users", label: "Users", icon: Users }
