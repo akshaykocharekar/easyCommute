@@ -90,7 +90,7 @@ exports.getRevenue = async (req, res) => {
     });
 
     const totalSubscribers = users.length;
-    const totalRevenue = totalSubscribers * 500;
+    const totalRevenue = totalSubscribers * 30;
 
     res.json({
       totalSubscribers,
