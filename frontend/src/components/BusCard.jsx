@@ -30,26 +30,34 @@ function BusCard({ bus }) {
 
       {/* Header */}
       <div className="flex items-center justify-between">
-
         <div className="flex items-center gap-2">
           <span className="text-lg">🚌</span>
-
-          <h3 className="text-lg font-semibold text-slate-900">
-            {bus.busNumber}
-          </h3>
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">
+              {bus.busNumber}
+            </h3>
+            {bus.route && (
+              <p className="text-xs text-slate-500">
+                {bus.route.startPoint} → {bus.route.endPoint}
+              </p>
+            )}
+          </div>
         </div>
 
         <span className={`text-xs px-2 py-1 rounded-full ${badgeColor}`}>
           {crowdLevel}
         </span>
-
       </div>
 
+      {/* Route name if available */}
+      {bus.route?.routeName && (
+        <p className="mt-2 text-xs font-medium text-emerald-600">
+          🛣 {bus.route.routeName}
+        </p>
+      )}
 
       {/* Occupancy */}
-
       <div className="mt-4">
-
         <div className="flex justify-between text-xs text-slate-500 mb-1">
           <span>Occupancy</span>
           <span>{occupancyPercent}%</span>
@@ -65,21 +73,16 @@ function BusCard({ bus }) {
         <p className="text-xs text-slate-500 mt-2">
           {occupancy} / {capacity} passengers
         </p>
-
       </div>
 
-
       {/* Seats left */}
-
       {seatsLeft > 0 && (
         <p className="text-xs text-slate-500 mt-2">
           {seatsLeft} seats left
         </p>
       )}
 
-
       {/* Action */}
-
       <Link to={`/track/${bus._id}`} className="mt-4">
         <button className="w-full rounded-full bg-slate-900 py-2 text-sm text-white hover:bg-slate-800 transition">
           Track Bus

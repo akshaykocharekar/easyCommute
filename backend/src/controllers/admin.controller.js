@@ -15,7 +15,7 @@ exports.getAdminStats = async (req, res) => {
       subscriptionPlan: "PREMIUM",
       subscriptionStatus: "ACTIVE",
     });
-    const revenue = totalSubscribers * 500; // ₹500 per premium subscriber
+    const revenue = totalSubscribers * 30; // ₹30 per premium subscriber
 
     res.json({
       totalBuses,

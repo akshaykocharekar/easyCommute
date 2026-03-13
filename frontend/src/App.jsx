@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Suspense, useContext, useEffect, useState, lazy } from "react";
+import ForgotPassword from "./pages/ForgotPassword";
 
 import DashboardLayout from "./layouts/DashboardLayout";
 
@@ -104,6 +105,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/register-operator" element={<OperatorRegister />} />
+            
+<Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* USER DASHBOARD */}
             <Route

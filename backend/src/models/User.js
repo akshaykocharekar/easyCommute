@@ -56,12 +56,32 @@ const userSchema = new mongoose.Schema(
       default: "FREE",
     },
 
-    subscriptionStatus: {
-      type: String,
-      enum: ["ACTIVE", "INACTIVE"],
-      default: "INACTIVE",
-    },
+ subscriptionStatus: {
+  type: String,
+  enum: ["ACTIVE", "INACTIVE", "TRIAL"],  // add TRIAL
+  default: "INACTIVE",
+},
+emailVerified: {
+  type: Boolean,
+  default: false,
+},
 
+otp: {
+  type: String,
+},
+
+otpExpiresAt: {
+  type: Date,
+},
+// Add these two new fields:
+trialStartedAt: {
+  type: Date,
+},
+
+trialUsed: {
+  type: Boolean,
+  default: false,
+},
     razorpayPaymentId: {
       type: String,
     },
@@ -72,5 +92,7 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+
 
 module.exports = mongoose.model("User", userSchema);

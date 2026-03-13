@@ -10,7 +10,11 @@ connectDB();
 
 const io = new Server(server, {
   cors: {
-    origin: "https://easy-commute-one.vercel.app/"
+    origin: [
+      "http://localhost:5173",
+      "https://easy-commute-one.vercel.app",
+    ],
+    credentials: true,
   }
 });
 
