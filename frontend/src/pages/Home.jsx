@@ -131,9 +131,9 @@ function Home() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { value: "500+", label: "Active Buses" },
-              { value: "40+",  label: "Routes Covered" },
-              { value: "10k+", label: "Daily Commuters" },
+              { value: "10",   label: "Active Buses" },
+              { value: "10",   label: "Routes Covered" },
+              { value: "100+",  label: "Daily Commuters" },
             ].map((s, i) => (
               <div
                 key={s.label}
@@ -179,9 +179,9 @@ function Home() {
           <div className="relative flex flex-col md:flex-row gap-12 items-start">
             <div className="hidden md:block absolute top-10 left-0 w-full h-0.5 -z-10" style={{ backgroundColor: "rgba(16,183,127,0.2)" }} />
             {[
-              { n: "1", title: "Register", desc: "Create an account to save your frequent routes and favorite stops." },
-              { n: "2", title: "Search",   desc: "Pick your destination and choose from the best available bus routes." },
-              { n: "3", title: "Track",    desc: "Watch your bus move on the map and get a notification when it's 2 mins away." },
+              { n: "1", title: "Register", desc: "Create a free account to view bus listings, timings, and available routes across Goa." },
+              { n: "2", title: "Search",   desc: "Pick your destination and browse real bus schedules and route options instantly." },
+              { n: "3", title: "Track",    desc: "Upgrade to Pro and watch your bus live on the map — get ETA right to your stop." },
             ].map((step) => (
               <div key={step.n} className="flex-1 flex flex-col items-center text-center">
                 <div
@@ -198,47 +198,94 @@ function Home() {
         </div>
       </section>
 
-      {/* ── PREMIUM ── */}
+      {/* ── PLANS ── */}
       <section className="py-24 px-4">
-        <div
-          className="max-w-4xl mx-auto rounded-[2rem] border p-8 md:p-16 relative overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #0f172a, #10221c)", borderColor: "rgba(16,183,127,0.3)" }}
-        >
-          <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full blur-3xl pointer-events-none" style={{ backgroundColor: "rgba(16,183,127,0.1)" }} />
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1">
-              <div className="font-bold text-xs uppercase tracking-widest px-3 py-1 rounded-full w-max mb-4"
-                style={{ backgroundColor: "rgba(16,183,127,0.2)", color: "#10b77f" }}>
-                Premium Plan
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">Simple, honest pricing</h2>
+          <p className="text-slate-400">Start free. Unlock everything for a one-time payment.</p>
+        </div>
+
+        <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+
+          {/* Free Plan */}
+          <div className="glass-card p-8 rounded-2xl flex flex-col">
+            <div className="mb-6">
+              <p className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-2">Free</p>
+              <p className="text-5xl font-black text-white">₹0</p>
+              <p className="text-slate-500 text-sm mt-1">Forever free</p>
+            </div>
+            <ul className="space-y-4 mb-8 flex-1">
+              {[
+                "View all bus listings",
+                "Check bus timings & schedules",
+                "Browse all 10 routes",
+                "Search by destination",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-3 text-slate-300 text-sm">
+                  <span className="material-symbols-outlined" style={{ color: "#10b77f", fontSize: "18px" }}>check_circle</span>
+                  {item}
+                </li>
+              ))}
+              {[
+                "Live bus tracking",
+                "Real-time ETA",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-3 text-slate-600 text-sm line-through">
+                  <span className="material-symbols-outlined" style={{ color: "#475569", fontSize: "18px" }}>cancel</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Link to="/register">
+              <button className="w-full px-6 py-3 border border-slate-600 text-white font-bold rounded-xl hover:bg-slate-800 transition-all">
+                Get Started Free
+              </button>
+            </Link>
+          </div>
+
+          {/* Pro Plan */}
+          <div
+            className="p-8 rounded-2xl flex flex-col relative overflow-hidden border"
+            style={{ background: "linear-gradient(135deg, #0f2d22, #10221c)", borderColor: "rgba(16,183,127,0.4)" }}
+          >
+            <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full blur-2xl pointer-events-none" style={{ backgroundColor: "rgba(16,183,127,0.15)" }} />
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-widest mb-2" style={{ color: "#10b77f" }}>Pro</p>
+                  <p className="text-5xl font-black text-white">₹30</p>
+                  <p className="text-slate-400 text-sm mt-1">One-time, lifetime access</p>
+                </div>
+                <div className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest"
+                  style={{ backgroundColor: "rgba(16,183,127,0.2)", color: "#10b77f" }}>
+                  Best Value
+                </div>
               </div>
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
-                Go Premium for <span style={{ color: "#10b77f" }}>Advanced Features</span>
-              </h2>
-              <ul className="space-y-4 mb-8">
-                {["Precise Live ETA for every stop", "Priority GPS data refresh", "Completely Ad-free experience"].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-slate-300">
-                    <span className="material-symbols-outlined" style={{ color: "#10b77f", fontSize: "20px" }}>check_circle</span>
+              <ul className="space-y-4 mb-8 flex-1">
+                {[
+                  "Everything in Free",
+                  "Live GPS bus tracking",
+                  "Real-time ETA to your stop",
+                  "Completely ad-free experience",
+                  "Lifetime access — pay once",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-slate-200 text-sm">
+                    <span className="material-symbols-outlined" style={{ color: "#10b77f", fontSize: "18px" }}>check_circle</span>
                     {item}
                   </li>
                 ))}
               </ul>
               <Link to="/plans">
                 <button
-                  className="px-10 py-4 rounded-xl font-black text-lg transition-all hover:brightness-110"
+                  className="w-full px-6 py-3 font-black rounded-xl text-base transition-all hover:brightness-110"
                   style={{ backgroundColor: "#10b77f", color: "#10221c" }}
                 >
-                  View Plans
+                  Get Pro — ₹30
                 </button>
               </Link>
             </div>
-            <div className="w-48 h-48 md:w-64 md:h-64 flex items-center justify-center rounded-full border-4 flex-shrink-0"
-              style={{ borderColor: "rgba(16,183,127,0.2)" }}>
-              <div className="w-40 h-40 md:w-52 md:h-52 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: "rgba(16,183,127,0.1)" }}>
-                <span className="material-symbols-outlined animate-pulse" style={{ color: "#10b77f", fontSize: "7rem" }}>star</span>
-              </div>
-            </div>
           </div>
+
         </div>
       </section>
 
@@ -253,7 +300,7 @@ function Home() {
                 <span className="text-2xl font-bold tracking-tight text-white">EasyCommute</span>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed">
-                Making Goa's public transport reliable and accessible for everyone. Tracking 500+ buses daily.
+                Making Goa's public transport reliable and accessible for everyone. Tracking 10 buses across 10 routes daily.
               </p>
             </div>
 
@@ -270,7 +317,7 @@ function Home() {
               <ul className="space-y-4 text-slate-400 text-sm">
                 <li><Link to="/login"             className="hover:text-emerald-400 transition-colors">Login</Link></li>
                 <li><Link to="/register"          className="hover:text-emerald-400 transition-colors">Register</Link></li>
-                <li><Link to="/plans"             className="hover:text-emerald-400 transition-colors">Premium Plans</Link></li>
+                <li><Link to="/plans"             className="hover:text-emerald-400 transition-colors">Go Pro — ₹30</Link></li>
                 <li><Link to="/register-operator" className="hover:text-emerald-400 transition-colors">Operator Portal</Link></li>
               </ul>
             </div>
