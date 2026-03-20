@@ -1,14 +1,14 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const transporter = require("../config/mailer");
+const resend = require("../config/mailer");
 
 // Helper — generate 6-digit OTP
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 const sendOTPEmail = async (email, otp, subject, message) => {
-  await transporter.sendMail({
-    from: `"EasyCommute" <${process.env.GMAIL_USER}>`,
+  const { error } = await resend.emails.send({
+    from: "EasyCommute <onboarding@resend.dev>", // ✅ works without domain verification
     to: email,
     subject,
     html: `
@@ -20,6 +20,11 @@ const sendOTPEmail = async (email, otp, subject, message) => {
       </div>
     `,
   });
+
+  if (error) {
+    console.error("❌ Resend email error:", error);
+    throw new Error(error.message);
+  }
 };
 
 // REGISTER
@@ -39,11 +44,16 @@ exports.register = async (req, res) => {
       password: hashedPassword,
       role: "USER",
       otp,
-      otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 mins
+      otpExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
       emailVerified: false,
     });
 
-    await sendOTPEmail(email, otp, "Verify your EasyCommute account", "Use the OTP below to verify your email:");
+    try {
+      await sendOTPEmail(email, otp, "Verify your EasyCommute account", "Use the OTP below to verify your email:");
+    } catch (emailError) {
+      await User.findByIdAndDelete(user._id);
+      return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
+    }
 
     res.status(201).json({
       message: "OTP sent to your email. Please verify to complete registration.",
@@ -89,7 +99,12 @@ exports.resendOTP = async (req, res) => {
     user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    await sendOTPEmail(user.email, otp, "Your new EasyCommute OTP", "Here is your new OTP:");
+    try {
+      await sendOTPEmail(user.email, otp, "Your new EasyCommute OTP", "Here is your new OTP:");
+    } catch (emailError) {
+      return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
+    }
+
     res.json({ message: "OTP resent successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -119,7 +134,12 @@ exports.registerOperator = async (req, res) => {
       emailVerified: false,
     });
 
-    await sendOTPEmail(email, otp, "Verify your EasyCommute Operator account", "Use the OTP below to verify your email:");
+    try {
+      await sendOTPEmail(email, otp, "Verify your EasyCommute Operator account", "Use the OTP below to verify your email:");
+    } catch (emailError) {
+      await User.findByIdAndDelete(operator._id);
+      return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
+    }
 
     res.status(201).json({
       message: "OTP sent to your email. Please verify to complete registration.",
@@ -150,7 +170,12 @@ exports.login = async (req, res) => {
       user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
       await user.save();
 
-      await sendOTPEmail(email, otp, "Your EasyCommute login OTP", "Use this OTP to complete your login:");
+      try {
+        await sendOTPEmail(email, otp, "Your EasyCommute login OTP", "Use this OTP to complete your login:");
+      } catch (emailError) {
+        return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
+      }
+
       return res.json({ message: "OTP sent to your email.", userId: user._id, requiresOTP: true });
     }
 
@@ -215,7 +240,12 @@ exports.forgotPassword = async (req, res) => {
     user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await user.save();
 
-    await sendOTPEmail(email, otp, "Reset your EasyCommute password", "Use this OTP to reset your password:");
+    try {
+      await sendOTPEmail(email, otp, "Reset your EasyCommute password", "Use this OTP to reset your password:");
+    } catch (emailError) {
+      return res.status(500).json({ message: "Failed to send OTP email. Please try again." });
+    }
+
     res.json({ message: "OTP sent to your email.", userId: user._id });
   } catch (error) {
     res.status(500).json({ message: error.message });

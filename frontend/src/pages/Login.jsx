@@ -5,18 +5,23 @@ import axios from "../api/axios";
 import toast from "react-hot-toast";
 
 function Login() {
-  const [step, setStep] = useState(1); // 1=credentials, 2=otp
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [slowWarning, setSlowWarning] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setSlowWarning(false);
+
+    const timer = setTimeout(() => setSlowWarning(true), 8000);
+
     try {
       const { data } = await axios.post("/auth/login", { email, password });
 
@@ -33,15 +38,16 @@ function Login() {
     } catch (error) {
       const err = error?.response?.data;
       if (err?.userId) {
-        // Email not verified
         setUserId(err.userId);
         toast.error(err.message);
         setStep(2);
         return;
       }
-      toast.error(err?.message || "Login failed");
+      toast.error(err?.message || "Login failed. Please try again.");
     } finally {
+      clearTimeout(timer);
       setLoading(false);
+      setSlowWarning(false);
     }
   };
 
@@ -86,8 +92,22 @@ function Login() {
 
               <button type="submit" disabled={loading}
                 className="rounded-full bg-black py-2 text-sm font-medium text-white transition hover:opacity-80 disabled:opacity-60">
-                {loading ? "Logging in..." : "Login"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    Logging in...
+                  </span>
+                ) : "Login"}
               </button>
+
+              {slowWarning && (
+                <p className="text-center text-xs text-amber-500 animate-pulse">
+                  ⏳ Server is waking up, please wait up to 30 seconds...
+                </p>
+              )}
             </form>
           </>
         ) : (

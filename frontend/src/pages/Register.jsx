@@ -1,31 +1,38 @@
 import { useState } from "react";
-import { registerUser } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "../api/axios";
 import toast from "react-hot-toast";
 
 function Register() {
-  const [step, setStep] = useState(1); // 1=form, 2=otp
+  const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [slowWarning, setSlowWarning] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setSlowWarning(false);
+
+    // Show warning if server takes more than 8s (Render cold start)
+    const timer = setTimeout(() => setSlowWarning(true), 8000);
+
     try {
       const { data } = await axios.post("/auth/register", { name, email, password });
       setUserId(data.userId);
       toast.success("OTP sent to your email!");
       setStep(2);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Registration failed");
+      toast.error(error?.response?.data?.message || "Registration failed. Please try again.");
     } finally {
+      clearTimeout(timer);
       setLoading(false);
+      setSlowWarning(false);
     }
   };
 
@@ -68,10 +75,25 @@ function Register() {
                 className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-200" />
               <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required
                 className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-200" />
+
               <button type="submit" disabled={loading}
-                className="w-full rounded-full bg-emerald-500 py-2 text-sm font-medium text-white hover:bg-emerald-400 disabled:opacity-50">
-                {loading ? "Sending OTP..." : "Register"}
+                className="w-full rounded-full bg-emerald-500 py-2 text-sm font-medium text-white hover:bg-emerald-400 disabled:opacity-50 transition-all">
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    Sending OTP...
+                  </span>
+                ) : "Register"}
               </button>
+
+              {slowWarning && (
+                <p className="text-center text-xs text-amber-500 animate-pulse">
+                  ⏳ Server is waking up, please wait up to 30 seconds...
+                </p>
+              )}
             </form>
           </>
         ) : (
