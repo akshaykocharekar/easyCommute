@@ -164,7 +164,7 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
     // Operator gets OTP on every login
-   /* if (user.role === "BUS_OPERATOR") {
+    if (user.role === "BUS_OPERATOR") {
       const otp = generateOTP();
       user.otp = otp;
       user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
@@ -195,9 +195,9 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-*/
+
 // VERIFY OPERATOR LOGIN OTP
-exports.verifyLoginOTP = async (req, res) => {
+/*exports.verifyLoginOTP = async (req, res) => {
   try {
     const { userId, otp } = req.body;
 
@@ -226,7 +226,7 @@ exports.verifyLoginOTP = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+*/
 // FORGOT PASSWORD - send OTP
 exports.forgotPassword = async (req, res) => {
   try {
