@@ -53,5 +53,3 @@ The application enables users to manage and optimize their daily commute with a 
 This project was developed as part of a Third Year academic program, focused on implementing a real-world full-stack application using modern technologies.
 
 
-
-## Project Structure
