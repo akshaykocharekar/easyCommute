@@ -35,7 +35,6 @@ The application enables users to manage and optimize their daily commute with a 
 ### Integrations
 - Razorpay Payment Gateway
 
-
 ## Usage
 
 - Access the application via the live URL or local setup  
