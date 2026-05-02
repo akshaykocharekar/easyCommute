@@ -13,6 +13,7 @@ const {
   getIntegrityReport,
   verifyOperator,
   rejectOperator,
+  resetUserPassword,
 } = require("../controllers/admin.controller");
 
 router.get("/stats", protect, authorizeRoles("SUPER_ADMIN"), getAdminStats);
@@ -23,7 +24,6 @@ router.get("/operators", protect, authorizeRoles("SUPER_ADMIN"), getOperators);
 router.patch("/operators/:id/verify", protect, authorizeRoles("SUPER_ADMIN"), verifyOperator);
 router.patch("/operators/:id/reject", protect, authorizeRoles("SUPER_ADMIN"), rejectOperator);
 router.get("/integrity", protect, authorizeRoles("SUPER_ADMIN"), getIntegrityReport);
+router.put("/users/:id/reset-password", protect, authorizeRoles("SUPER_ADMIN"), resetUserPassword);
 
 module.exports = router;
-
-

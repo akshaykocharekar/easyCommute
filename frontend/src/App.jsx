@@ -1,7 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Suspense, useContext, useEffect, useState, lazy } from "react";
-import ForgotPassword from "./pages/ForgotPassword";
-
 import DashboardLayout from "./layouts/DashboardLayout";
 
 import Home from "./pages/Home";
@@ -58,13 +56,21 @@ function AppSplash({ visible }) {
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-2xl text-white">
               🚌
             </div>
-            <div className="text-xl font-semibold text-slate-900">EasyCommute</div>
-            <div className="mt-1 text-sm text-slate-500">Getting things ready…</div>
+            <div className="text-xl font-semibold text-slate-900">
+              EasyCommute
+            </div>
+            <div className="mt-1 text-sm text-slate-500">
+              Getting things ready…
+            </div>
             <div className="mx-auto mt-5 h-1.5 w-48 overflow-hidden rounded-full bg-slate-100">
               <motion.div
                 initial={{ x: "-60%" }}
                 animate={{ x: "120%" }}
-                transition={{ duration: 1.0, ease: "easeInOut", repeat: Infinity }}
+                transition={{
+                  duration: 1.0,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                }}
                 className="h-full w-24 rounded-full bg-emerald-500"
               />
             </div>
@@ -91,7 +97,9 @@ function App() {
     <Router>
       <Navbar />
 
-      <div className={showBottomNav ? "pb-20 pb-safe-bottom md:pb-0" : undefined}>
+      <div
+        className={showBottomNav ? "pb-20 pb-safe-bottom md:pb-0" : undefined}
+      >
         <Suspense
           fallback={
             <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-slate-500">
@@ -105,8 +113,6 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/register-operator" element={<OperatorRegister />} />
-            
-<Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* USER DASHBOARD */}
             <Route
@@ -196,7 +202,7 @@ function App() {
               <Route path="create-bus" element={<CreateBus />} />
               <Route path="create-route" element={<CreateRoute />} />
               <Route path="assign-route" element={<AssignRoute />} />
-              
+
               <Route path="add-stop" element={<AddStop />} />
               <Route path="users" element={<AdminUsers />} />
             </Route>

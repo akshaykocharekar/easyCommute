@@ -31,16 +31,11 @@ exports.getAdminStats = async (req, res) => {
   }
 };
 
-
-
-
 exports.getUsers = async (req, res) => {
   try {
-
     const users = await User.find({ role: "USER" });
 
     res.json(users);
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -48,11 +43,9 @@ exports.getUsers = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-
     await User.findByIdAndDelete(req.params.id);
 
     res.json({ message: "User deleted" });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -60,7 +53,6 @@ exports.deleteUser = async (req, res) => {
 
 exports.grantPremium = async (req, res) => {
   try {
-
     const user = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -71,7 +63,6 @@ exports.grantPremium = async (req, res) => {
     );
 
     res.json(user);
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -79,11 +70,9 @@ exports.grantPremium = async (req, res) => {
 
 exports.getOperators = async (req, res) => {
   try {
-
     const operators = await User.find({ role: "BUS_OPERATOR" });
 
     res.json(operators);
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -176,7 +165,9 @@ exports.getIntegrityReport = async (req, res) => {
       .populate("operator", "name email");
 
     // Buses whose assigned route has no stops
-    const referencedRouteIds = await Bus.distinct("route", { route: { $ne: null } });
+    const referencedRouteIds = await Bus.distinct("route", {
+      route: { $ne: null },
+    });
     const routesWithNoStops = await Route.find({
       _id: { $in: referencedRouteIds },
       "stops.0": { $exists: false },
@@ -199,6 +190,27 @@ exports.getIntegrityReport = async (req, res) => {
         busesWithRouteMissingStops: busesWithRouteMissingStops.length,
       },
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.resetUserPassword = async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6)
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters." });
+
+    const bcrypt = require("bcryptjs");
+    const hashed = await bcrypt.hash(newPassword, 10);
+    const user = await User.findByIdAndUpdate(req.params.id, {
+      password: hashed,
+    });
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    res.json({ message: "Password reset successfully." });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
